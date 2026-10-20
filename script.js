@@ -1,27 +1,33 @@
-/* script.js - JavaScript estructurado para Portfolio Luxury */
+/* ==========================================
+   SCRIPT PRINCIPAL - PORTFOLIO LUXURY
+   ========================================== */
 document.addEventListener('DOMContentLoaded', function() {
     initSmoothScroll();
     initMobileMenu();
-    initButtonHover();
-    initProjectCards();
     initFormInteractions();
 });
 
-/* Scroll suave entre secciones */
+/**
+ * Scroll suave entre secciones al pulsar enlaces con ancla (#)
+ */
 function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    
+    anchors.forEach(anchor => {
         anchor.addEventListener('click', function(e) {
-            e.preventDefault();
             const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
+            if (targetId === '#' || !targetId) return;
             
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
-                const headerHeight = document.querySelector('.header')?.offsetHeight || 0;
-                const targetPosition = targetElement.offsetTop - headerHeight;
-                
+                e.preventDefault();
+                const header = document.querySelector('.header');
+                const headerOffset = header ? header.offsetHeight : 0;
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
                 window.scrollTo({
-                    top: targetPosition,
+                    top: offsetPosition,
                     behavior: 'smooth'
                 });
             }
@@ -29,35 +35,32 @@ function initSmoothScroll() {
     });
 }
 
-/* Menú responsivo */
+/**
+ * Manejo del menú desplegable en dispositivos móviles
+ */
 function initMobileMenu() {
+    const nav = document.querySelector('.nav');
     const navMenu = document.querySelector('.nav__menu');
     const navLinks = document.querySelectorAll('.nav__link');
     
-    // Crear botón menú para móviles si no existe
-    const createMenuButton = () => {
-        let button = document.querySelector('.nav__menu-btn');
-        if (!button) {
-            button = document.createElement('button');
-            button.className = 'nav__menu-btn';
-            button.innerHTML = '<span></span><span></span><span></span>';
-            button.setAttribute('aria-label', 'Abrir menú de navegación');
-            const nav = document.querySelector('.nav');
-            if (nav) nav.appendChild(button);
-        }
-        return button;
-    };
-    
-    if (window.innerWidth <= 900) {
-        createMenuButton();
+    if (!nav || !navMenu) return;
+
+    // Crear botón hamburguesa si no existe en el HTML
+    let menuBtn = document.querySelector('.nav__menu-btn');
+    if (!menuBtn && window.innerWidth <= 900) {
+        menuBtn = document.createElement('button');
+        menuBtn.className = 'nav__menu-btn';
+        menuBtn.setAttribute('aria-label', 'Abrir menú de navegación');
+        menuBtn.innerHTML = '<span style="display:block;width:22px;height:2px;background:#FFF;margin:4px 0;"></span>'.repeat(3);
+        menuBtn.style.cssText = 'background:none;border:none;cursor:pointer;padding:10px;z-index:1001;';
+        nav.appendChild(menuBtn);
     }
-    
-    const menuBtn = document.querySelector('.nav__menu-btn');
-    if (menuBtn && navMenu) {
+
+    if (menuBtn) {
         menuBtn.addEventListener('click', function() {
-            const isFlex = navMenu.style.display === 'flex';
-            navMenu.style.display = isFlex ? 'none' : 'flex';
-            if (!isFlex) {
+            const isOpen = navMenu.classList.toggle('nav__menu--open');
+            if (isOpen) {
+                navMenu.style.display = 'flex';
                 navMenu.style.flexDirection = 'column';
                 navMenu.style.position = 'absolute';
                 navMenu.style.top = '80px';
@@ -66,70 +69,48 @@ function initMobileMenu() {
                 navMenu.style.background = 'var(--bg-secondary)';
                 navMenu.style.padding = '20px';
                 navMenu.style.borderBottom = '1px solid var(--border-color)';
+            } else {
+                navMenu.style.display = '';
             }
         });
     }
-    
+
+    // Cierra el menú al hacer clic en cualquier enlace
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
-            if (window.innerWidth <= 900 && navMenu) {
-                navMenu.style.display = 'none';
+            if (navMenu.classList.contains('nav__menu--open')) {
+                navMenu.classList.remove('nav__menu--open');
+                navMenu.style.display = '';
             }
         });
     });
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 900 && navMenu) {
-            navMenu.style.display = 'flex';
-            navMenu.style.position = 'static';
-            navMenu.style.flexDirection = 'row';
-            navMenu.style.padding = '0';
-            navMenu.style.border = 'none';
-        }
-    });
 }
 
-/* Microinteracciones en botones */
-function initButtonHover() {
-    const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-        });
-        button.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-}
-
-/* Efectos en tarjetas de proyectos */
-function initProjectCards() {
-    const projectCards = document.querySelectorAll('.project-card');
-    projectCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-            this.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.4)';
-        });
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = 'none';
-        });
-    });
-}
-
-/* Interacciones del formulario */
+/**
+ * Feedback visual al enviar el formulario de contacto
+ */
 function initFormInteractions() {
-    const forms = document.querySelectorAll('.contact__form');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const button = this.querySelector('button[type="submit"]');
-            if (button) {
-                button.textContent = '¡Mensaje enviado!';
-                button.style.background = '#4A0E4E';
-                button.style.color = '#FFFFFF';
-                this.reset();
-            }
-        });
+    const form = document.querySelector('.contact__form');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        
+        if (submitBtn) {
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '¡Mensaje enviado!';
+            submitBtn.style.background = 'var(--accent-violet)';
+            submitBtn.style.color = '#FFFFFF';
+            
+            form.reset();
+
+            // Restaura el texto original del botón después de 4 segundos
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.style.background = '';
+                submitBtn.style.color = '';
+            }, 4000);
+        }
     });
 }

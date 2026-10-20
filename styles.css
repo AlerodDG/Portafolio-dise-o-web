@@ -16,6 +16,7 @@
     --transition-smooth: 0.3s ease;
 }
 
+/* Corrección del guion suelto que afectaba la estructura */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -166,7 +167,6 @@ h1, h2, h3, h4, h5, h6 {
     text-align: center;
 }
 
-/* Fotografía en círculo perfecto con bordes elegantes */
 .about__img {
     width: 280px;
     height: 280px;
@@ -286,7 +286,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================
-   SECCIÓN CONTACTO Y BOTONES
+   SECCIÓN CONTACTO, FORMULARIO Y REDES SOCIALES
    ========================================== */
 .contact {
     padding: 100px 20px;
@@ -299,6 +299,7 @@ h1, h2, h3, h4, h5, h6 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
+    align-items: center;
 }
 
 .contact__form {
@@ -353,6 +354,45 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--accent-violet);
 }
 
+/* Estilos de Redes Sociales */
+.contact__social {
+    text-align: left;
+}
+
+.contact__social-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.contact__social-list {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+    padding: 0;
+}
+
+.contact__social-link {
+    width: 45px;
+    height: 45px;
+    background: var(--bg-accent);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: var(--transition-fast);
+}
+
+.contact__social-link:hover {
+    background: var(--accent-violet);
+    color: var(--accent-gold);
+    transform: translateY(-3px);
+    border-color: var(--accent-violet);
+}
+
 /* ==========================================
    FOOTER Y RESPONSIVE
    ========================================== */
@@ -395,5 +435,8 @@ h1, h2, h3, h4, h5, h6 {
     .footer__container {
         flex-direction: column;
         gap: 15px;
+    }
+    .contact__social-list {
+        justify-content: center;
     }
 }
